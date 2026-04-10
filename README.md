@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TracePoint SPB
+
+High-performance landing page for **TracePoint SPB** — a data-driven flyer distribution & web development startup based in Saint Petersburg, Russia.
+
+**Live site:** [mhmdaris15.github.io/tracepointspb](https://mhmdaris15.github.io/tracepointspb)
+
+---
+
+## Features
+
+- **Dark glassmorphism design** — animated mesh gradients, frosted glass cards, glint sweep effects
+- **Framer Motion animations** — reveal-on-scroll, spring-physics counters, scroll-driven timeline
+- **Bilingual (EN / RU)** — switch languages instantly via the navbar toggle; page fades and all text swaps
+- **Two services showcased** — Flyer Distribution + Website Development
+- **Contact ready** — Telegram and email buttons linked directly in CTA and footer
+
+## Tech Stack
+
+| Tool | Version |
+|------|---------|
+| Next.js (App Router) | 16 |
+| React | 19 |
+| TypeScript | 5 |
+| Tailwind CSS | v4 |
+| Framer Motion | 12 |
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+app/
+├── page.tsx              # Entry point (Server Component)
+├── layout.tsx            # Root layout + metadata
+├── globals.css           # Tailwind v4 import + custom animations/glassmorphism
+├── lib/
+│   └── content.ts        # ALL copy for EN + RU — edit here to update any text
+└── components/
+    ├── LandingPage.tsx   # Client wrapper — holds locale (EN↔RU) state
+    ├── MeshBackground.tsx
+    ├── Navbar.tsx
+    ├── LanguageSwitcher.tsx
+    ├── HeroSection.tsx
+    ├── FeaturesSection.tsx
+    ├── PlansSection.tsx
+    ├── StatsSection.tsx
+    ├── ProcessSection.tsx
+    ├── CTASection.tsx
+    └── Footer.tsx
+```
 
-## Learn More
+## Editing Content
 
-To learn more about Next.js, take a look at the following resources:
+All text lives in [`app/lib/content.ts`](app/lib/content.ts). Edit `content.en` or `content.ru` — the change reflects across the whole site automatically.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Contact details** (email, Telegram) are in the `contact` export at the top of that file.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Adding a New Language
 
-## Deploy on Vercel
+1. Add the locale to the `Locale` type: `export type Locale = 'en' | 'ru' | 'de'`
+2. Add a matching block `de: { ... }` in the `content` object (copy the `en` block as a template)
+3. Update `LandingPage.tsx` if you want a multi-locale dropdown instead of a two-way toggle
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deployed to **GitHub Pages** via GitHub Actions on every push to `main`.
+
+### First-time setup (do once)
+
+1. Go to your repo → **Settings → Pages**
+2. Under **Source**, select **"GitHub Actions"**
+3. Push to `main` — the action runs, and the site goes live in ~2 minutes
+
+### Manual trigger
+
+Go to **Actions → Deploy to GitHub Pages → Run workflow**.
+
+### Build locally (preview the static export)
+
+```bash
+npm run build   # outputs static files to ./out
+npx serve out   # preview at http://localhost:3000
+```
+
+## Contact
+
+| Channel | Details |
+|---------|---------|
+| Email | [muhammadaris1945@gmail.com](mailto:muhammadaris1945@gmail.com) |
+| Telegram | [+79810409453](https://t.me/+79810409453) |
+| Location | Saint Petersburg, Russia |
