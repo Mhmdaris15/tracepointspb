@@ -1,0 +1,65 @@
+# ──────────────────────────────────────────────────────────────────
+# TracePoint SPB — Docker Build & Deploy to GCP VM
+# ──────────────────────────────────────────────────────────────────
+# This workflow builds Docker images and deploys them to your
+# GCP Compute Engine VM via SSH.
+#
+# Required GitHub Secrets:
+#   GCP_VM_HOST       — Public IP of your GCP VM
+#   GCP_VM_USER       — SSH username on the VM
+#   GCP_SSH_KEY        — Private SSH key for the VM
+#   POSTGRES_PASSWORD — Database password
+#   JWT_SECRET        — JWT signing secret
+#   YANDEX_MAPS_API_KEY — Yandex Maps API key
+# ──────────────────────────────────────────────────────────────────
+
+name: Deploy to GCP VM (Docker)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: "deploy"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.GCP_VM_HOST }}
+          username: ${{ secrets.GCP_VM_USER }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          script: |
+            # Navigate to project directory
+            cd ~/tracepointspb || git clone https://github.com/${{ github.repository }}.git ~/tracepointspb && cd ~/tracepointspb
+
+            # Pull latest code
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Create .env file from secrets
+            cat > .env << 'EOF'
+            POSTGRES_USER=trace_user
+            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            POSTGRES_DB=tracepoint_db
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            YANDEX_MAPS_API_KEY=${{ secrets.YANDEX_MAPS_API_KEY }}
+            DOMAIN=${{ secrets.GCP_VM_HOST }}
+            EOF
+
+            # Build and restart containers
+            docker compose build --no-cache
+            docker compose up -d
+
+            # Clean up old images
+            docker image prune -f
+
+            echo "✅ Deployment complete!"

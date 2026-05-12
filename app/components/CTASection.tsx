@@ -3,149 +3,265 @@
 import { motion } from 'framer-motion';
 import { contact } from '@/app/lib/content';
 import type { SiteContent } from '@/app/lib/content';
+import RegistrationMark from './RegistrationMark';
+import { asset } from '@/app/lib/paths';
 
 type CTAProps = SiteContent['cta'];
 
-export default function CTASection({ headline, subheadline, emailLabel, telegramLabel, orLabel }: CTAProps) {
+const ease = [0.22, 1, 0.36, 1] as [number, number, number, number];
+
+export default function CTASection({
+  headline,
+  subheadline,
+  emailLabel,
+  telegramLabel,
+  orLabel,
+  stampLabel,
+  affix,
+}: CTAProps) {
   const headlineLines = headline.split('\n');
 
   return (
-    <section id="contact" className="relative px-6 py-32 lg:px-8">
-      {/* Background glow */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse at center, rgba(124,58,237,0.07) 0%, transparent 65%)' }}
-      />
-
-      <div className="mx-auto max-w-4xl">
-        <motion.div
-          className="relative overflow-hidden rounded-3xl p-10 lg:p-16 text-center"
-          style={{
-            background: 'linear-gradient(135deg, rgba(124,58,237,0.1) 0%, rgba(37,99,235,0.06) 50%, rgba(8,11,20,0.9) 100%)',
-            border: '1px solid rgba(139,92,246,0.18)',
-            backdropFilter: 'blur(40px)',
-            WebkitBackdropFilter: 'blur(40px)',
-          }}
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
+    <section
+      id="contact"
+      className="relative border-t border-[var(--ink)]/20 px-6 py-28 lg:px-10 lg:py-40"
+    >
+      <div className="relative mx-auto max-w-[1300px]">
+        {/* Wax-seal envelope — pinned beside the postcard like a real
+            piece of correspondence dropped on the same desk. Hidden on
+            small screens so the postcard stays readable. */}
+        <motion.figure
+          className="pointer-events-none absolute -bottom-10 -left-8 z-20 hidden w-56 lg:block lg:w-72"
+          style={{ rotate: '-9deg' }}
+          initial={{ opacity: 0, y: 40, rotate: -16 }}
+          whileInView={{ opacity: 1, y: 0, rotate: -9 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: 1.1, delay: 0.4, ease }}
         >
-          {/* Corner glows */}
-          <div className="absolute top-0 left-0 h-64 w-64 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle at top left, rgba(139,92,246,0.18) 0%, transparent 70%)', transform: 'translate(-30%, -30%)' }} />
-          <div className="absolute bottom-0 right-0 h-64 w-64 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle at bottom right, rgba(59,130,246,0.12) 0%, transparent 70%)', transform: 'translate(30%, 30%)' }} />
-          <div className="absolute top-0 left-1/4 right-1/4 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.5), transparent)' }} />
-
-          {/* Floating icon */}
-          <motion.div
-            className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-2xl"
-            style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.25) 0%, rgba(37,99,235,0.25) 100%)', border: '1px solid rgba(139,92,246,0.25)' }}
-            animate={{ y: [0, -6, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+          <div
+            className="relative overflow-hidden border border-[var(--ink)]"
+            style={{
+              boxShadow:
+                '10px 14px 0 -4px rgba(26,23,20,0.10), 18px 28px 30px -10px rgba(26,23,20,0.30)',
+            }}
           >
-            <svg viewBox="0 0 24 24" fill="none" className="h-9 w-9 text-violet-300" aria-hidden="true">
-              <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <img
+              src={asset('/images/generated/envelope-with-wax-seal.png')}
+              alt="Envelope with crimson wax seal — TracePoint correspondence"
+              loading="lazy"
+              decoding="async"
+              className="block w-full photo-duo"
+              draggable={false}
+            />
+          </div>
+          <figcaption className="mt-2 text-center font-mono text-[9px] uppercase tracking-[0.22em] text-[var(--ink-mute)]">
+            Sealed. On record.
+          </figcaption>
+        </motion.figure>
+
+        <motion.article
+          className="card-paper card-paper-raised relative overflow-hidden"
+          style={{ transform: 'rotate(-0.6deg)' }}
+          initial={{ opacity: 0, y: 40, rotate: -1.5 }}
+          whileInView={{ opacity: 1, y: 0, rotate: -0.6 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9, ease }}
+        >
+          {/* Registration corners */}
+          <div className="reg-mark" style={{ top: 12, left: 12 }} />
+          <div className="reg-mark" style={{ top: 12, right: 12, left: 'auto' }} />
+          <div className="reg-mark" style={{ bottom: 12, left: 12 }} />
+          <div className="reg-mark" style={{ bottom: 12, right: 12, left: 'auto' }} />
+
+          {/* Postage stamp — top right */}
+          <motion.div
+            className="absolute top-6 right-6 z-20 lg:top-10 lg:right-10"
+            initial={{ opacity: 0, scale: 1.8, rotate: 25 }}
+            whileInView={{ opacity: 1, scale: 1, rotate: 6 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.5, ease }}
+          >
+            <div className="relative">
+              {/* Perforated edge */}
+              <div
+                className="absolute -inset-2 bg-[var(--paper)]"
+                style={{
+                  WebkitMaskImage:
+                    'radial-gradient(circle at 3px 3px, transparent 2.5px, #000 3px)',
+                  WebkitMaskSize: '8px 8px',
+                  maskImage:
+                    'radial-gradient(circle at 3px 3px, transparent 2.5px, #000 3px)',
+                  maskSize: '8px 8px',
+                }}
+              />
+              <div
+                className="relative flex flex-col items-center gap-1 border-2 border-[var(--post)] bg-[var(--paper)] px-5 py-3 text-center"
+                style={{
+                  boxShadow:
+                    'inset 0 0 0 1px var(--paper-edge), 0 8px 0 -3px rgba(26,23,20,0.15)',
+                }}
+              >
+                <span className="font-mono text-[9px] uppercase tracking-[0.24em] text-[var(--post)]">
+                  RUSSIA · POST
+                </span>
+                <span
+                  className="font-display text-3xl font-black leading-none tracking-[-0.04em] text-[var(--post)]"
+                  style={{
+                    fontVariationSettings: '"opsz" 144, "SOFT" 80, "WONK" 1',
+                  }}
+                >
+                  {stampLabel}
+                </span>
+                <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-[var(--post)]">
+                  191000 · СПБ
+                </span>
+              </div>
+            </div>
           </motion.div>
 
-          {/* Headline */}
-          <h2 className="mb-4 text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
-            {headlineLines.map((line, i) => (
-              <span key={i} className="block">
-                {i === 0 ? <span className="gradient-text">{line}</span> : line}
-              </span>
-            ))}
-          </h2>
-
-          <p className="mx-auto mb-12 max-w-xl text-lg text-slate-400 leading-relaxed">{subheadline}</p>
-
-          {/* Contact buttons */}
-          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            {/* Telegram */}
-            <motion.a
-              href={contact.telegramUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative inline-flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl px-7 py-4 text-sm font-semibold text-white sm:w-auto"
-              style={{
-                background: 'linear-gradient(135deg, #0088cc 0%, #006ba6 100%)',
-                boxShadow: '0 0 30px rgba(0,136,204,0.4)',
-              }}
-              whileHover={{ scale: 1.04, boxShadow: '0 0 50px rgba(0,136,204,0.6)' }}
-              whileTap={{ scale: 0.97 }}
-            >
-              <motion.span
-                className="absolute inset-0 -skew-x-12"
-                style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)', x: '-100%' }}
-                whileHover={{ x: '300%' }}
-                transition={{ duration: 0.6 }}
-              />
-              {/* Telegram SVG */}
-              <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 shrink-0" aria-hidden="true">
-                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161l-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.932z" />
-              </svg>
-              <span>
-                <span className="block text-[10px] font-normal opacity-75 text-left">{telegramLabel}</span>
-                <span className="block">{contact.telegram}</span>
-              </span>
-            </motion.a>
-
-            {/* Email */}
-            <motion.a
-              href={`mailto:${contact.email}`}
-              className="relative inline-flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl px-7 py-4 text-sm font-semibold text-white sm:w-auto"
-              style={{
-                background: 'linear-gradient(135deg, rgba(124,58,237,0.85) 0%, rgba(37,99,235,0.85) 100%)',
-                boxShadow: '0 0 30px rgba(124,58,237,0.35)',
-              }}
-              whileHover={{ scale: 1.04, boxShadow: '0 0 50px rgba(124,58,237,0.55)' }}
-              whileTap={{ scale: 0.97 }}
-            >
-              <motion.span
-                className="absolute inset-0 -skew-x-12"
-                style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)', x: '-100%' }}
-                whileHover={{ x: '300%' }}
-                transition={{ duration: 0.6 }}
-              />
-              <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" aria-hidden="true">
-                <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span>
-                <span className="block text-[10px] font-normal opacity-75 text-left">{emailLabel}</span>
-                <span className="block">{contact.email}</span>
-              </span>
-            </motion.a>
-          </div>
-
-          {/* Or divider */}
-          <div className="mt-10 flex items-center gap-4">
-            <div className="h-px flex-1" style={{ background: 'rgba(255,255,255,0.06)' }} />
-            <span className="text-xs text-slate-500">{orLabel}</span>
-            <div className="h-px flex-1" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          </div>
-
-          {/* Direct contact info */}
-          <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <div
-              className="flex items-center gap-2 rounded-full px-4 py-2 text-sm"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
-            >
-              <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 text-violet-400" aria-hidden="true">
-                <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span className="text-slate-400">{contact.email}</span>
+          {/* Top postcard bar */}
+          <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--ink)] bg-[var(--paper-deep)] px-6 py-3 sm:px-10">
+            <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--ink)]">
+              <RegistrationMark size={11} />
+              <span>POSTCARD · OPEN CORRESPONDENCE</span>
             </div>
-            <div
-              className="flex items-center gap-2 rounded-full px-4 py-2 text-sm"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 text-blue-400" aria-hidden="true">
-                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161l-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.932z" />
-              </svg>
-              <span className="text-slate-400">{contact.telegram}</span>
+            <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--ink-mute)]">
+              FROM: TRACEPOINT SPB / TO: YOU
+            </div>
+          </header>
+
+          {/* Card body — split spread */}
+          <div className="grid grid-cols-1 gap-0 md:grid-cols-2">
+            {/* LEFT — message */}
+            <div className="px-6 py-10 sm:px-10 sm:py-14 md:border-r md:border-[var(--ink)]">
+              <span className="font-mono text-[11px] uppercase tracking-[0.24em] text-[var(--post)]">
+                MESSAGE
+              </span>
+              <h2 className="mt-4 font-display text-[12vw] sm:text-[8vw] md:text-[5vw] font-black leading-[0.9] tracking-[-0.04em] text-[var(--ink)]">
+                {headlineLines.map((l, i) => (
+                  <span key={i} className="block">
+                    {i === 0 ? l : (
+                      <em className="not-italic">
+                        <span className="ink-underline">{l.split(' ')[0]}</span>{' '}
+                        {l.split(' ').slice(1).join(' ')}
+                      </em>
+                    )}
+                  </span>
+                ))}
+              </h2>
+              <p className="mt-6 max-w-md text-[15px] leading-relaxed text-[var(--ink-soft)]">
+                {subheadline}
+              </p>
+
+              {/* Handwriting flourish */}
+              <div className="mt-8 flex items-end justify-between gap-4">
+                <svg
+                  viewBox="0 0 200 36"
+                  className="h-9 w-44 text-[var(--ink)]"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M5 28 C 12 8, 22 30, 32 18 S 50 6, 60 22 S 78 32, 90 16 S 110 4, 122 24 S 144 32, 158 14 S 180 26, 195 18"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--ink-mute)]">
+                  — The TracePoint SPB team
+                </span>
+              </div>
+            </div>
+
+            {/* RIGHT — address column / actions */}
+            <div className="relative px-6 py-10 sm:px-10 sm:py-14">
+              <span className="font-mono text-[11px] uppercase tracking-[0.24em] text-[var(--post)]">
+                ADDRESS · REPLY VIA
+              </span>
+
+              <div className="mt-6 space-y-4">
+                {/* Email pill */}
+                <a
+                  href={`mailto:${contact.email}`}
+                  className="group flex items-center justify-between gap-4 border border-[var(--ink)] bg-[var(--paper)] px-5 py-4 transition-all hover:bg-[var(--ink)] hover:text-[var(--paper)]"
+                  style={{ boxShadow: '4px 4px 0 0 var(--paper-edge)' }}
+                >
+                  <div>
+                    <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-current opacity-70">
+                      {emailLabel}
+                    </div>
+                    <div className="mt-1 font-display text-lg font-bold tracking-tight text-current">
+                      {contact.email}
+                    </div>
+                  </div>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    className="h-6 w-6 shrink-0 text-current transition-transform group-hover:translate-x-1"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M5 12h14M13 6l6 6-6 6"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    />
+                  </svg>
+                </a>
+
+                {/* Telegram pill */}
+                <a
+                  href={contact.telegramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center justify-between gap-4 border border-[var(--ink)] bg-[var(--paper)] px-5 py-4 transition-all hover:bg-[var(--post)] hover:text-[var(--paper)] hover:border-[var(--post)]"
+                  style={{ boxShadow: '4px 4px 0 0 var(--paper-edge)' }}
+                >
+                  <div>
+                    <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-current opacity-70">
+                      {telegramLabel}
+                    </div>
+                    <div className="mt-1 font-display text-lg font-bold tracking-tight text-current">
+                      {contact.telegram}
+                    </div>
+                  </div>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="h-6 w-6 shrink-0"
+                    aria-hidden="true"
+                  >
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161l-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.932z" />
+                  </svg>
+                </a>
+              </div>
+
+              {/* Divider */}
+              <div className="my-8 flex items-center gap-3">
+                <div className="h-px flex-1 bg-[var(--ink)]/30" />
+                <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--ink-mute)]">
+                  {orLabel}
+                </span>
+                <div className="h-px flex-1 bg-[var(--ink)]/30" />
+              </div>
+
+              {/* Affix reply stamp box */}
+              <div
+                className="relative flex h-24 items-center justify-center border-2 border-dashed border-[var(--ink)]/40 text-center"
+              >
+                <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--ink-mute)]">
+                  {affix}
+                </span>
+              </div>
+
+              {/* Location footer */}
+              <div className="mt-6 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--ink-mute)]">
+                <span>{contact.location}</span>
+                <span>{contact.coords}</span>
+              </div>
             </div>
           </div>
-        </motion.div>
+        </motion.article>
       </div>
     </section>
   );

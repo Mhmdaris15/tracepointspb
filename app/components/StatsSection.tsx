@@ -1,7 +1,11 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
-import { motion, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import RegistrationMark from './RegistrationMark';
+import { asset } from '@/app/lib/paths';
 
 interface StatItem {
   value: number;
@@ -13,172 +17,252 @@ interface StatItem {
 interface StatsSectionProps {
   eyebrow: string;
   headline: string;
+  ledgerLabel: string;
+  totalLabel: string;
   items: StatItem[];
 }
 
+const ease = [0.22, 1, 0.36, 1] as [number, number, number, number];
+
 function AnimatedNumber({ value, suffix }: { value: number; suffix: string }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const motionVal = useMotionValue(0);
-  const spring = useSpring(motionVal, { stiffness: 60, damping: 20 });
-  const [display, setDisplay] = useState('0');
-  const isInView = useInView(ref, { once: true, margin: '-50px' });
 
   useEffect(() => {
-    if (isInView) {
-      motionVal.set(value);
+    gsap.registerPlugin(ScrollTrigger);
+    const el = ref.current;
+    if (!el) return;
+    if (value === 0) {
+      el.textContent = `0${suffix}`;
+      return;
     }
-  }, [isInView, value, motionVal]);
 
-  useEffect(() => {
-    return spring.on('change', (latest) => {
-      setDisplay(Math.round(latest).toLocaleString());
+    const obj = { v: 0 };
+    const tween = gsap.to(obj, {
+      v: value,
+      duration: 2.2,
+      ease: 'power3.out',
+      paused: true,
+      onUpdate: () => {
+        el.textContent = Math.round(obj.v).toLocaleString() + suffix;
+      },
     });
-  }, [spring]);
+
+    const trigger = ScrollTrigger.create({
+      trigger: el,
+      start: 'top 85%',
+      once: true,
+      onEnter: () => tween.play(),
+    });
+
+    return () => {
+      trigger.kill();
+      tween.kill();
+    };
+  }, [value, suffix]);
 
   return (
-    <span ref={ref}>
-      {display}
-      {suffix}
+    <span ref={ref} className="figure-xl tabular">
+      0{suffix}
     </span>
   );
 }
 
-const statColors = [
-  { text: '#a78bfa', glow: 'rgba(139,92,246,0.3)', bg: 'rgba(139,92,246,0.08)', border: 'rgba(139,92,246,0.2)' },
-  { text: '#60a5fa', glow: 'rgba(59,130,246,0.3)', bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.2)' },
-  { text: '#34d399', glow: 'rgba(52,211,153,0.3)', bg: 'rgba(52,211,153,0.08)', border: 'rgba(52,211,153,0.2)' },
-  { text: '#f472b6', glow: 'rgba(244,114,182,0.3)', bg: 'rgba(244,114,182,0.08)', border: 'rgba(244,114,182,0.2)' },
-];
-
-export default function StatsSection({ eyebrow, headline, items }: StatsSectionProps) {
+export default function StatsSection({
+  eyebrow,
+  headline,
+  ledgerLabel,
+  totalLabel,
+  items,
+}: StatsSectionProps) {
   const headlineLines = headline.split('\n');
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  });
+  const ledgerImgY = useTransform(scrollYProgress, [0, 1], ['-12%', '12%']);
 
   return (
-    <section id="stats" className="relative px-6 py-32 lg:px-8">
-      {/* Background accent */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse at center, rgba(139,92,246,0.05) 0%, transparent 70%)' }}
-      />
-
-      <div className="mx-auto max-w-7xl">
+    <section
+      id="stats"
+      ref={sectionRef}
+      className="relative border-t border-[var(--ink)]/20 px-6 py-28 lg:px-10 lg:py-40"
+    >
+      <div className="mx-auto max-w-[1400px]">
         {/* Header */}
-        <div className="mb-16 text-center">
-          <motion.span
-            className="inline-block mb-4 rounded-full px-4 py-1.5 text-xs font-semibold tracking-widest uppercase"
-            style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.25)', color: '#60a5fa' }}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            {eyebrow}
-          </motion.span>
+        <div className="mb-14 grid grid-cols-12 gap-6 lg:mb-20">
+          <div className="col-span-12 lg:col-span-4">
+            <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.24em] text-[var(--ink-mute)]">
+              <span className="h-px w-6 bg-[var(--ink)]" />
+              <span>{eyebrow}</span>
+            </div>
+          </div>
           <motion.h2
-            className="text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl"
-            initial={{ opacity: 0, y: 20 }}
+            className="col-span-12 lg:col-span-8 font-display text-[12vw] sm:text-[10vw] lg:text-[6vw] font-black leading-[0.9] tracking-[-0.04em] text-[var(--ink)]"
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.9, ease }}
+            style={{ fontVariationSettings: '"opsz" 144, "SOFT" 40, "WONK" 1' }}
           >
-            {headlineLines.map((line, i) => (
+            {headlineLines.map((l, i) => (
               <span key={i} className="block">
-                {i === 0 ? <span className="gradient-text-blue">{line}</span> : line}
+                {i === 1 ? <em className="not-italic text-[var(--post)]">{l}</em> : l}
               </span>
             ))}
           </motion.h2>
         </div>
 
-        {/* Stats grid */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {items.map((item, i) => {
-            const color = statColors[i % statColors.length];
-            return (
-              <motion.div
-                key={item.label}
-                className="relative group overflow-hidden rounded-2xl p-8 text-center"
-                style={{
-                  background: `linear-gradient(135deg, ${color.bg} 0%, rgba(8,11,20,0.7) 100%)`,
-                  border: `1px solid ${color.border}`,
-                  backdropFilter: 'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
-                }}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, margin: '-30px' }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                whileHover={{ scale: 1.03, y: -4 }}
-              >
-                {/* Glow */}
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                  style={{ background: `radial-gradient(ellipse at center, ${color.glow} 0%, transparent 70%)` }}
-                />
-
-                {/* Value */}
-                <div
-                  className="mb-2 text-5xl font-black lg:text-6xl"
-                  style={{ color: color.text, textShadow: `0 0 30px ${color.glow}` }}
-                >
-                  {item.value === 0 ? (
-                    <span>0</span>
-                  ) : (
-                    <AnimatedNumber value={item.value} suffix={item.suffix} />
-                  )}
-                </div>
-
-                {/* Label */}
-                <div className="mb-1 text-sm font-semibold text-white">{item.label}</div>
-
-                {/* Description */}
-                <div className="text-xs text-slate-500">{item.description}</div>
-
-                {/* Corner accent */}
-                <div
-                  className="absolute top-0 right-0 h-16 w-16 rounded-bl-full opacity-20"
-                  style={{ background: `radial-gradient(circle at top right, ${color.text} 0%, transparent 70%)` }}
-                />
-              </motion.div>
-            );
-          })}
-        </div>
-
-        {/* Divider visual */}
+        {/* Ledger photographic banner — a real ledger being written, the
+            origin of the numbers tabulated below */}
         <motion.div
-          className="mt-16 mx-auto h-px max-w-3xl"
-          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(139,92,246,0.4) 30%, rgba(59,130,246,0.4) 70%, transparent 100%)' }}
-          initial={{ scaleX: 0 }}
-          whileInView={{ scaleX: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1, delay: 0.3 }}
-        />
-
-        {/* Transparency call-out */}
-        <motion.div
-          className="mt-16 mx-auto max-w-2xl rounded-2xl p-8 text-center"
-          style={{
-            background: 'rgba(139,92,246,0.06)',
-            border: '1px solid rgba(139,92,246,0.15)',
-            backdropFilter: 'blur(20px)',
-          }}
+          className="relative mb-0 overflow-hidden border border-[var(--ink)] border-b-0"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={{ duration: 0.8, ease }}
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.4))' }} />
-            <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-violet-400" aria-hidden="true">
-              <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, rgba(59,130,246,0.4), transparent)' }} />
+          <div className="relative aspect-[16/6] w-full sm:aspect-[16/4]">
+            <motion.img
+              src={asset('/images/generated/ledger-page-detail.png')}
+              alt="Hand writing campaign serial numbers in a paper ledger"
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 h-[120%] w-full object-cover photo-duo"
+              style={{ y: ledgerImgY }}
+              draggable={false}
+            />
+            {/* Soft cream wash on the right so type sits cleanly */}
+            <div
+              className="absolute inset-y-0 right-0 w-2/3 sm:w-1/2"
+              style={{
+                background:
+                  'linear-gradient(270deg, rgba(236,228,210,0.96) 25%, rgba(236,228,210,0.6) 60%, transparent 100%)',
+              }}
+            />
+            <div className="absolute inset-0 flex items-center justify-end px-6 sm:px-10">
+              <div className="max-w-md text-right">
+                <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--post)]">
+                  Originating Record
+                </p>
+                <p className="mt-2 font-display text-2xl italic leading-tight text-[var(--ink)] sm:text-3xl">
+                  Every figure below started its life on a paper line.
+                </p>
+                <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--ink-mute)]">
+                  Ledger №2026-Q2 · last entry 17:48 MSK
+                </p>
+              </div>
+            </div>
+            <div className="reg-mark" style={{ top: 10, left: 10 }} />
+            <div className="reg-mark" style={{ top: 10, right: 10, left: 'auto' }} />
           </div>
-          <p className="text-lg font-semibold text-white">
-            100% Transparency. <span className="text-violet-400">No Black Boxes.</span>
-          </p>
-          <p className="mt-2 text-sm text-slate-400">
-            Our direct distribution model eliminates intermediaries — you see exactly where your materials go, every single time.
-          </p>
+        </motion.div>
+
+        {/* Ledger card */}
+        <motion.div
+          className="card-paper card-paper-raised relative overflow-hidden"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease, delay: 0.1 }}
+        >
+          {/* Faint engraved map watermark — sits behind all rows at low
+              opacity, anchors the ledger geographically to the city */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-0"
+            style={{
+              backgroundImage: `url(${asset('/images/generated/map-spb-engraved.png')})`,
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right -10% center',
+              opacity: 0.08,
+              mixBlendMode: 'multiply',
+            }}
+          />
+
+          {/* Registration corners */}
+          <div className="reg-mark" style={{ top: 10, left: 10 }} />
+          <div className="reg-mark" style={{ top: 10, right: 10, left: 'auto' }} />
+          <div className="reg-mark" style={{ bottom: 10, left: 10 }} />
+          <div
+            className="reg-mark"
+            style={{ bottom: 10, right: 10, left: 'auto' }}
+          />
+
+          {/* Top filing bar */}
+          <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--ink)] bg-[var(--paper-deep)] px-6 py-3 sm:px-8">
+            <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--ink)]">
+              <RegistrationMark size={11} />
+              <span>{ledgerLabel}</span>
+            </div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--post)]">
+              CERTIFIED · TRACEPOINT SPB
+            </div>
+          </header>
+
+          {/* Rows */}
+          <ol className="divide-y divide-[var(--ink)]">
+            {items.map((item, i) => (
+              <motion.li
+                key={item.label}
+                className="grid grid-cols-12 items-center gap-4 px-6 py-8 sm:px-10 sm:py-10 transition-colors hover:bg-[var(--paper-deep)]"
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: '-30px' }}
+                transition={{ duration: 0.6, delay: i * 0.08, ease }}
+              >
+                {/* Numeric prefix */}
+                <span className="col-span-1 font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--ink-mute)]">
+                  L.{String(i + 1).padStart(2, '0')}
+                </span>
+
+                {/* Massive figure */}
+                <span className="col-span-5 text-[var(--ink)] text-[14vw] sm:text-[10vw] lg:text-[6vw]">
+                  {item.value === 0 ? (
+                    <span className="figure-xl tabular">0</span>
+                  ) : (
+                    <AnimatedNumber value={item.value} suffix={item.suffix} />
+                  )}
+                </span>
+
+                {/* Label */}
+                <div className="col-span-5">
+                  <p className="font-display text-xl font-bold leading-tight text-[var(--ink)] lg:text-2xl">
+                    {item.label}
+                  </p>
+                  <p className="mt-1 text-sm text-[var(--ink-soft)]">
+                    {item.description}
+                  </p>
+                </div>
+
+                {/* Verified stamp */}
+                <div className="col-span-1 hidden justify-end sm:flex">
+                  <span
+                    className="rotate-[-6deg] border border-[var(--post)] px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.22em] text-[var(--post)]"
+                  >
+                    VER
+                  </span>
+                </div>
+              </motion.li>
+            ))}
+          </ol>
+
+          {/* Totals bar */}
+          <footer className="grid grid-cols-12 items-center gap-4 border-t-2 border-double border-[var(--ink)] bg-[var(--ink)] px-6 py-6 sm:px-10">
+            <span className="col-span-1 font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--paper)]/70">
+              SUM
+            </span>
+            <span className="col-span-5 font-display text-[6vw] sm:text-[4vw] font-black leading-none tracking-[-0.04em] text-[var(--paper)] lg:text-3xl">
+              {totalLabel}
+            </span>
+            <span className="col-span-6 text-right font-display text-2xl font-black leading-tight tracking-[-0.02em] text-[var(--paper)] lg:text-3xl">
+              100% transparency.
+              <span className="block text-[var(--post)] italic">
+                No black boxes.
+              </span>
+            </span>
+          </footer>
         </motion.div>
       </div>
     </section>

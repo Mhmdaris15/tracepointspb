@@ -1,176 +1,176 @@
 'use client';
 
-import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion } from 'framer-motion';
+import RegistrationMark from './RegistrationMark';
 
 type IconName = 'key' | 'camera' | 'network';
 
-const icons: Record<IconName, React.FC<{ className?: string; style?: React.CSSProperties }>> = {
+const icons: Record<IconName, React.FC<{ className?: string }>> = {
   key: ({ className }) => (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <circle cx="8" cy="15" r="5" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M13 10l8-8M17 6l2 2M19 4l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <svg viewBox="0 0 48 48" fill="none" className={className} aria-hidden="true">
+      <circle cx="18" cy="30" r="9" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M26 22l16-16M37 11l5 5M40 8l5 5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <circle cx="18" cy="30" r="2.5" fill="currentColor" />
     </svg>
   ),
   camera: ({ className }) => (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <path d="M14.5 4h-5L7 7H4a2 2 0 00-2 2v9a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2h-3l-2.5-3z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="12" cy="13" r="3" stroke="currentColor" strokeWidth="1.5" />
+    <svg viewBox="0 0 48 48" fill="none" className={className} aria-hidden="true">
+      <path
+        d="M28 9h-10l-4 6H7a3 3 0 00-3 3v19a3 3 0 003 3h34a3 3 0 003-3V18a3 3 0 00-3-3h-7l-4-6z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <circle cx="24" cy="26" r="7" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="24" cy="26" r="2.5" fill="currentColor" />
+      <rect x="36" y="19" width="3" height="3" fill="currentColor" />
     </svg>
   ),
   network: ({ className }) => (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <circle cx="12" cy="5" r="2" stroke="currentColor" strokeWidth="1.5" />
-      <circle cx="5" cy="19" r="2" stroke="currentColor" strokeWidth="1.5" />
-      <circle cx="19" cy="19" r="2" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M12 7v4m0 0l-5.5 6M12 11l5.5 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <svg viewBox="0 0 48 48" fill="none" className={className} aria-hidden="true">
+      <circle cx="24" cy="9" r="4" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="9" cy="39" r="4" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="39" cy="39" r="4" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="24" cy="24" r="3" fill="currentColor" />
+      <path
+        d="M24 13v8M24 27l-13 9M24 27l13 9"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
     </svg>
   ),
 };
 
-const cardGradients = [
-  { bg: 'rgba(139,92,246,0.08)', border: 'rgba(139,92,246,0.2)', glow: 'rgba(139,92,246,0.15)', icon: '#a78bfa' },
-  { bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.2)', glow: 'rgba(59,130,246,0.15)', icon: '#60a5fa' },
-  { bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.2)', glow: 'rgba(16,185,129,0.15)', icon: '#34d399' },
-];
-
 interface FeaturesProps {
   eyebrow: string;
   headline: string;
+  numberPrefix: string;
   cards: { icon: string; title: string; description: string; tag: string }[];
 }
 
-function FeatureCard({
-  card,
-  gradient,
-  index,
-}: {
-  card: { icon: string; title: string; description: string; tag: string };
-  gradient: (typeof cardGradients)[0];
-  index: number;
-}) {
-  const Icon = icons[card.icon as IconName] ?? icons.key;
+const ease = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
-  return (
-    <motion.div
-      className="relative group overflow-hidden rounded-2xl p-px"
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.6, delay: index * 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
-      whileHover={{ scale: 1.02, y: -4 }}
-    >
-      {/* Gradient border */}
-      <div
-        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        style={{ background: `linear-gradient(135deg, ${gradient.border} 0%, transparent 50%, ${gradient.border} 100%)` }}
-      />
-      <div
-        className="absolute inset-px rounded-2xl"
-        style={{ border: `1px solid ${gradient.border}` }}
-      />
-
-      <div
-        className="relative rounded-2xl p-8"
-        style={{
-          background: `linear-gradient(135deg, ${gradient.bg} 0%, rgba(8,11,20,0.8) 100%)`,
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-        }}
-      >
-        {/* Glow spot */}
-        <div
-          className="absolute top-0 right-0 h-40 w-40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
-          style={{ background: `radial-gradient(circle at center, ${gradient.glow} 0%, transparent 70%)`, transform: 'translate(20%, -20%)' }}
-        />
-
-        {/* Glint sweep on hover */}
-        <motion.div
-          className="absolute inset-0 rounded-2xl pointer-events-none overflow-hidden"
-          initial={false}
-        >
-          <motion.div
-            className="absolute inset-0 -skew-x-12"
-            style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%)', x: '-100%' }}
-            whileHover={{ x: '300%' }}
-            transition={{ duration: 0.8, ease: 'easeInOut' }}
-          />
-        </motion.div>
-
-        {/* Icon */}
-        <div
-          className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl"
-          style={{ background: `rgba(${gradient.icon === '#a78bfa' ? '139,92,246' : gradient.icon === '#60a5fa' ? '59,130,246' : '16,185,129'},0.15)` }}
-        >
-          <Icon className="h-6 w-6" style={{ color: gradient.icon } as React.CSSProperties} />
-        </div>
-
-        {/* Tag */}
-        <div className="mb-3">
-          <span
-            className="inline-block rounded-full px-3 py-1 text-[10px] font-semibold tracking-widest uppercase"
-            style={{ background: `${gradient.bg}`, border: `1px solid ${gradient.border}`, color: gradient.icon }}
-          >
-            {card.tag}
-          </span>
-        </div>
-
-        {/* Title */}
-        <h3 className="mb-3 text-xl font-bold text-white">{card.title}</h3>
-
-        {/* Description */}
-        <p className="text-sm leading-relaxed text-slate-400">{card.description}</p>
-
-        {/* Bottom arrow */}
-        <div className="mt-6 flex items-center gap-2 text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: gradient.icon }}>
-          <span>Learn more</span>
-          <svg viewBox="0 0 24 24" fill="none" className="h-3 w-3" aria-hidden="true">
-            <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-export default function FeaturesSection({ eyebrow, headline, cards }: FeaturesProps) {
+export default function FeaturesSection({
+  eyebrow,
+  headline,
+  numberPrefix,
+  cards,
+}: FeaturesProps) {
   const headlineLines = headline.split('\n');
 
   return (
-    <section id="services" className="relative px-6 py-32 lg:px-8">
-      <div className="mx-auto max-w-7xl">
-        {/* Section header */}
-        <div className="mb-16 text-center">
-          <motion.span
-            className="inline-block mb-4 rounded-full px-4 py-1.5 text-xs font-semibold tracking-widest uppercase"
-            style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.25)', color: '#a78bfa' }}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            {eyebrow}
-          </motion.span>
+    <section
+      id="services"
+      className="relative border-t border-[var(--ink)]/20 px-6 py-28 lg:px-10 lg:py-40"
+    >
+      <div className="mx-auto max-w-[1400px]">
+        {/* ── Section header — masthead row ───────────────────────────── */}
+        <div className="mb-16 grid grid-cols-12 gap-6 lg:mb-24">
+          <div className="col-span-12 lg:col-span-4">
+            <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.24em] text-[var(--ink-mute)]">
+              <span className="h-px w-6 bg-[var(--ink)]" />
+              <span>{eyebrow}</span>
+            </div>
+          </div>
           <motion.h2
-            className="text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl"
-            initial={{ opacity: 0, y: 20 }}
+            className="col-span-12 lg:col-span-8 font-display text-[12vw] sm:text-[10vw] lg:text-[6vw] font-black leading-[0.9] tracking-[-0.04em] text-[var(--ink)]"
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.9, ease }}
+            style={{ fontVariationSettings: '"opsz" 144, "SOFT" 40, "WONK" 1' }}
           >
-            {headlineLines.map((line, i) => (
+            {headlineLines.map((l, i) => (
               <span key={i} className="block">
-                {i === 0 ? <span className="gradient-text">{line}</span> : line}
+                {i === 1 ? <em className="not-italic text-[var(--post)]">{l}</em> : l}
               </span>
             ))}
           </motion.h2>
         </div>
 
-        {/* Cards grid */}
-        <div className="grid gap-6 md:grid-cols-3">
-          {cards.map((card, i) => (
-            <FeatureCard key={card.title} card={card} gradient={cardGradients[i]} index={i} />
-          ))}
+        {/* ── Triptych ────────────────────────────────────────────────── */}
+        <div className="grid grid-cols-1 gap-x-6 gap-y-16 md:grid-cols-3">
+          {cards.map((card, i) => {
+            const Icon = icons[card.icon as IconName] ?? icons.key;
+            const numeral = String(i + 1).padStart(2, '0');
+            return (
+              <motion.article
+                key={card.title}
+                className="relative"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.7, delay: i * 0.12, ease }}
+              >
+                {/* Article meta */}
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--ink-mute)]">
+                    {numberPrefix} № {numeral}
+                  </span>
+                  <RegistrationMark size={12} color="var(--ink)" />
+                </div>
+
+                {/* Top rule */}
+                <div className="h-px w-full bg-[var(--ink)]" />
+                <div className="mt-1 h-px w-full bg-[var(--ink)]/30" />
+
+                {/* Massive numeral */}
+                <div className="relative mt-4 flex items-start justify-between">
+                  <span
+                    className="font-display text-[26vw] sm:text-[18vw] md:text-[12vw] lg:text-[9.5vw] font-black leading-[0.78] tracking-[-0.06em] text-[var(--post)] select-none"
+                    style={{
+                      fontVariationSettings:
+                        '"opsz" 144, "SOFT" 0, "WONK" 1',
+                    }}
+                  >
+                    {numeral}
+                  </span>
+                  {/* Icon as a stamp box */}
+                  <span
+                    className="mt-3 flex h-14 w-14 shrink-0 items-center justify-center border border-[var(--ink)]"
+                    style={{
+                      background:
+                        'repeating-linear-gradient(45deg, transparent 0 4px, rgba(26,23,20,0.05) 4px 5px)',
+                    }}
+                  >
+                    <Icon className="h-8 w-8 text-[var(--ink)]" />
+                  </span>
+                </div>
+
+                {/* Tag */}
+                <div className="mt-4">
+                  <span
+                    className="inline-block px-2 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--paper)]"
+                    style={{ background: 'var(--ink)' }}
+                  >
+                    {card.tag}
+                  </span>
+                </div>
+
+                {/* Title */}
+                <h3 className="mt-4 font-display text-3xl font-black leading-[0.95] tracking-[-0.03em] text-[var(--ink)] lg:text-4xl">
+                  {card.title}
+                </h3>
+
+                {/* Body */}
+                <p className="mt-4 text-[15px] leading-relaxed text-[var(--ink-soft)]">
+                  {card.description}
+                </p>
+
+                {/* Bottom footnote */}
+                <div className="mt-6 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--ink-mute)]">
+                  <span>FN. {numeral}</span>
+                  <span className="h-px flex-1 bg-[var(--ink)]/30" />
+                  <span>SEE PROCESS →</span>
+                </div>
+              </motion.article>
+            );
+          })}
         </div>
       </div>
     </section>

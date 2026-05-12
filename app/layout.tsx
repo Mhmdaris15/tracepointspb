@@ -1,27 +1,42 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const fraunces = Fraunces({
+  variable: "--font-display",
+  subsets: ["latin"],
+  axes: ["opsz", "SOFT", "WONK"],
+  display: "swap",
+});
+
+const instrumentSans = Instrument_Sans({
+  variable: "--font-sans",
   subsets: ["latin"],
   display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "TracePoint SPB — Data-Driven Flyer Distribution in St. Petersburg",
+  title: "TracePoint SPB — Door to Door, Data to Door. A Field Report from St. Petersburg.",
   description:
-    "Bridging the gap between physical flyer distribution and digital transparency. GPS-verified, photo-documented delivery across all districts of Saint Petersburg, Russia.",
-  keywords: ["flyer distribution", "Saint Petersburg", "offline marketing", "verified delivery", "TracePoint"],
+    "Verified flyer distribution and web development in Saint Petersburg. GPS-stamped delivery, photographic proof, no middlemen. Bridging paper and data, district by district.",
+  keywords: [
+    "flyer distribution",
+    "Saint Petersburg",
+    "offline marketing",
+    "verified delivery",
+    "TracePoint",
+    "web development",
+  ],
   openGraph: {
-    title: "TracePoint SPB — Data-Driven Offline Marketing",
-    description: "Verified flyer distribution with 100% transparency across St. Petersburg.",
+    title: "TracePoint SPB — Door to Door, Data to Door",
+    description:
+      "Verified flyer distribution & web development in Saint Petersburg. Every door, on the record.",
     type: "website",
     locale: "en_US",
   },
@@ -35,9 +50,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${instrumentSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[#080b14] text-slate-200">{children}</body>
+      <body className="min-h-full bg-[var(--paper)] text-[var(--ink)] font-sans">
+        {children}
+      </body>
     </html>
   );
 }

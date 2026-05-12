@@ -1,205 +1,336 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { contact, proofPhotos } from '@/app/lib/content';
+import type { SiteContent } from '@/app/lib/content';
+import RegistrationMark from './RegistrationMark';
+import Polaroid from './Polaroid';
 
-interface HeroProps {
-  eyebrow: string;
-  headline: string;
-  headlineSuffix: string;
-  subheadline: string;
-  cta: string;
-  ctaSecondary: string;
-  badge: string;
-}
-
-const containerVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.12 } },
+type HeroProps = SiteContent['hero'] & {
+  manifest: SiteContent['manifest'];
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] } },
-};
+const ease = [0.22, 1, 0.36, 1] as [number, number, number, number];
+const easeOut = [0.16, 1, 0.3, 1] as [number, number, number, number];
 
 export default function HeroSection({
-  eyebrow,
+  kicker,
   headline,
   headlineSuffix,
   subheadline,
   cta,
   ctaSecondary,
   badge,
+  serial,
+  meta,
+  receiptItems,
+  manifest,
 }: HeroProps) {
   const headlineLines = headline.split('\n');
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-16 overflow-hidden">
-      {/* Decorative ring */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '800px',
-          height: '800px',
-          borderRadius: '50%',
-          border: '1px solid rgba(139,92,246,0.06)',
-        }}
-      />
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '1100px',
-          height: '1100px',
-          borderRadius: '50%',
-          border: '1px solid rgba(59,130,246,0.04)',
-        }}
-      />
+    <section className="relative px-6 pt-32 pb-20 lg:px-10 lg:pt-40 lg:pb-32">
+      <div className="mx-auto max-w-[1400px]">
+        {/* ── KICKER ROW — file label + manifest origin ─────────────────── */}
+        <motion.div
+          className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease }}
+        >
+          <div className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.24em] text-[var(--ink-mute)]">
+            <RegistrationMark size={12} color="var(--ink)" />
+            <span>{kicker}</span>
+          </div>
+          <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--ink-mute)]">
+            {manifest.origin} <span className="opacity-50">→</span>{' '}
+            <span className="text-[var(--post)]">
+              {manifest.destination}
+            </span>
+          </div>
+        </motion.div>
 
-      <motion.div
-        className="relative mx-auto max-w-5xl w-full text-center"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {/* Eyebrow badge */}
-        <motion.div variants={itemVariants} className="mb-6 flex justify-center">
-          <span
-            className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold tracking-widest uppercase"
+        {/* ── HEADLINE LOCKUP ───────────────────────────────────────────── */}
+        <div className="relative grid grid-cols-12 gap-6">
+          {/* Left margin column — vertical ticker of door numbers */}
+          <div className="col-span-12 hidden lg:col-span-1 lg:flex lg:flex-col lg:items-start lg:gap-6">
+            <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--ink-mute)]">
+              SHEET
+            </div>
+            <div className="font-display text-[80px] font-black leading-none tracking-[-0.05em] text-[var(--ink)]">
+              01
+            </div>
+            <div
+              className="my-2 w-px flex-1 self-stretch"
+              style={{ background: 'var(--ink)' }}
+            />
+            <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--ink-mute)] [writing-mode:vertical-rl] rotate-180">
+              {serial}
+            </div>
+          </div>
+
+          {/* Headline column */}
+          <div className="col-span-12 lg:col-span-7 relative">
+            <h1 className="relative">
+              {/* Line 1 */}
+              <motion.span
+                className="font-display block text-[14vw] sm:text-[12vw] lg:text-[8.4vw] font-black leading-[0.92] tracking-[-0.045em] text-[var(--ink)]"
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, ease, delay: 0.15 }}
+                style={{
+                  fontVariationSettings: '"opsz" 144, "SOFT" 30, "WONK" 1',
+                }}
+              >
+                {headlineLines[0]}
+              </motion.span>
+
+              {/* Line 2 with mid-line ruler & accent */}
+              <motion.span
+                className="block relative"
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, ease, delay: 0.32 }}
+              >
+                <span
+                  className="font-display block text-[14vw] sm:text-[12vw] lg:text-[8.4vw] font-black leading-[0.92] tracking-[-0.045em] text-[var(--ink)] italic"
+                  style={{
+                    fontVariationSettings: '"opsz" 144, "SOFT" 80, "WONK" 1',
+                  }}
+                >
+                  <span className="ink-underline">
+                    {(headlineLines[1] ?? '').split(' ')[0]}
+                  </span>
+                  {' '}
+                  {(headlineLines[1] ?? '')
+                    .split(' ')
+                    .slice(1)
+                    .join(' ')}
+                </span>
+              </motion.span>
+            </h1>
+
+            {/* Suffix line — small italic */}
+            <motion.p
+              className="font-display mt-6 max-w-md text-base italic text-[var(--ink-soft)] leading-snug lg:text-lg"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.65 }}
+            >
+              — {headlineSuffix}
+            </motion.p>
+          </div>
+
+          {/* Right column — delivery receipt card + postmark */}
+          <div className="col-span-12 lg:col-span-4 relative">
+            {/* Postmark — diagonal, top-right */}
+            <motion.div
+              className="absolute -top-6 right-2 z-20 lg:-top-12 lg:-right-4"
+              initial={{ opacity: 0, scale: 1.6, rotate: -25 }}
+              animate={{ opacity: 0.95, scale: 1, rotate: -8 }}
+              transition={{ duration: 0.7, delay: 0.9, ease: easeOut }}
+            >
+              <div className="postmark">
+                <span className="leading-tight">SAINT</span>
+                <span className="leading-tight">PETERSBURG</span>
+                <span className="my-1 block h-px w-10 bg-current opacity-60" />
+                <span className="leading-tight">12 · 05 · 26</span>
+                <span className="leading-tight opacity-70">RU · 191000</span>
+                <span className="postmark-line" />
+              </div>
+            </motion.div>
+
+            {/* Receipt card */}
+            <motion.aside
+              className="card-paper card-paper-raised relative mt-12 p-6 lg:mt-0"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.5, ease }}
+            >
+              <div className="reg-mark" style={{ top: 6, left: 6 }} />
+              <div
+                className="reg-mark"
+                style={{ top: 6, right: 6, left: 'auto' }}
+              />
+
+              <header className="mb-5 flex items-baseline justify-between border-b border-[var(--ink)] pb-3">
+                <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--ink)]">
+                  Delivery Receipt
+                </span>
+                <span className="font-mono text-[10px] tabular text-[var(--post)]">
+                  №040612
+                </span>
+              </header>
+
+              <dl className="space-y-3">
+                {receiptItems.map((item) => (
+                  <div
+                    key={item.label}
+                    className="flex items-baseline justify-between gap-3 border-b border-dashed border-[var(--ink)]/30 pb-2"
+                  >
+                    <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--ink-mute)]">
+                      {item.label}
+                    </dt>
+                    <dd className="font-display text-sm font-semibold tabular text-[var(--ink)]">
+                      {item.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+
+              <footer className="mt-5 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="inline-block h-2 w-2 rounded-full bg-[var(--post)] animate-pulse" />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--ink)]">
+                    Verified — GPS stamped
+                  </span>
+                </div>
+                {/* Signature */}
+                <svg
+                  viewBox="0 0 64 24"
+                  className="h-6 w-16 text-[var(--ink)]"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M2 18 C 6 4, 10 22, 16 12 S 26 4, 32 14 S 42 22, 48 8 S 58 18, 62 10"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </footer>
+            </motion.aside>
+          </div>
+        </div>
+
+        {/* ── DECK + ACTIONS ────────────────────────────────────────────── */}
+        <div className="relative mt-16 grid grid-cols-12 gap-6">
+          <div className="hidden lg:col-span-1 lg:block" />
+          <motion.div
+            className="col-span-12 lg:col-span-7"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.85, ease }}
+          >
+            <p className="max-w-2xl text-lg leading-relaxed text-[var(--ink-soft)] lg:text-xl">
+              {subheadline}
+            </p>
+
+            <div className="mt-9 flex flex-wrap items-center gap-4">
+              <a href="#contact" className="btn-ink">
+                {cta}
+                <svg
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  className="h-3 w-3"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M2 8h12M9 3l5 5-5 5"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                </svg>
+              </a>
+              <a href="#process" className="btn-paper">
+                <svg
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  className="h-3 w-3"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M3 8h10M8 3v10"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                </svg>
+                {ctaSecondary}
+              </a>
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--ink-mute)]">
+                {badge}
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Right column — real-proof polaroid */}
+          <motion.div
+            className="col-span-12 lg:col-span-4 relative"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 1.05, ease: easeOut }}
+          >
+            {/* Tiny meta strip above */}
+            <div className="mb-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--ink-mute)]">
+              <span className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--post)] animate-pulse" />
+                FRESH FROM THE FIELD
+              </span>
+              <span>{meta.split(' · ')[1] ?? meta}</span>
+            </div>
+
+            <div className="relative">
+              <Polaroid
+                photo={proofPhotos[0]}
+                caption={`${proofPhotos[0].district} · ${proofPhotos[0].building}`}
+                treatment="duo"
+                aspect="4 / 5"
+                width="100%"
+                tilt={-1.5}
+                showTape
+                showPin
+                priority
+              />
+              {/* Press stamp pinned bottom-right */}
+              <span
+                className="press-stamp absolute -bottom-2 right-3 z-10"
+                style={{ background: 'rgba(255,255,255,0.92)' }}
+              >
+                <span className="h-1 w-1 bg-current" /> EXHIBIT A
+              </span>
+            </div>
+
+            {/* Caption beneath */}
+            <p className="mt-6 font-display text-sm italic leading-snug text-[var(--ink-soft)]">
+              Photographed this morning, on the floor where it was filed.
+              The dossier is real. Scroll for the rest.
+            </p>
+          </motion.div>
+        </div>
+
+        {/* ── BOTTOM RULE: a "delivery route" dashed line ──────────────── */}
+        <motion.div
+          className="mt-16 flex items-center gap-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 1.2 }}
+        >
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--ink)]">
+            A
+          </span>
+          <div
+            className="relative flex-1"
             style={{
-              background: 'rgba(139,92,246,0.1)',
-              border: '1px solid rgba(139,92,246,0.25)',
-              color: '#a78bfa',
+              backgroundImage:
+                'repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 12px)',
+              height: 1,
             }}
           >
             <span
-              className="h-1.5 w-1.5 rounded-full"
-              style={{ background: '#a78bfa', boxShadow: '0 0 6px #a78bfa' }}
+              className="absolute -top-1 h-3 w-3 -translate-x-1/2 rounded-full border border-[var(--ink)] bg-[var(--post)]"
+              style={{ left: '32%' }}
             />
-            {eyebrow}
-          </span>
-        </motion.div>
-
-        {/* Headline */}
-        <motion.h1 variants={itemVariants} className="mb-6">
-          <span className="block text-5xl font-black leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl xl:text-8xl">
-            {headlineLines.map((line, i) => (
-              <span key={i} className="block">
-                {i === 0 ? (
-                  <span className="gradient-text">{line}</span>
-                ) : (
-                  line
-                )}
-              </span>
-            ))}
-          </span>
-          <span
-            className="block text-5xl font-black leading-tight tracking-tight sm:text-6xl lg:text-7xl xl:text-8xl"
-            style={{ color: 'rgba(226,232,240,0.85)' }}
-          >
-            {headlineSuffix}
-          </span>
-        </motion.h1>
-
-        {/* Subheadline */}
-        <motion.p
-          variants={itemVariants}
-          className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-slate-400 sm:text-xl"
-        >
-          {subheadline}
-        </motion.p>
-
-        {/* CTAs */}
-        <motion.div variants={itemVariants} className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-          <motion.a
-            href="#contact"
-            className="relative inline-flex items-center gap-2 overflow-hidden rounded-full px-8 py-4 text-base font-semibold text-white"
-            style={{
-              background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)',
-              boxShadow: '0 0 40px rgba(124,58,237,0.4), 0 4px 24px rgba(0,0,0,0.4)',
-            }}
-            whileHover={{ scale: 1.04, boxShadow: '0 0 60px rgba(124,58,237,0.6), 0 4px 24px rgba(0,0,0,0.4)' }}
-            whileTap={{ scale: 0.97 }}
-          >
-            {/* Glint overlay */}
-            <motion.span
-              className="absolute inset-0 -skew-x-12"
-              style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)' }}
-              initial={{ x: '-100%' }}
-              whileHover={{ x: '300%' }}
-              transition={{ duration: 0.6, ease: 'easeInOut' }}
+            <span
+              className="absolute -top-1 h-3 w-3 -translate-x-1/2 rounded-full border border-[var(--ink)] bg-[var(--paper)]"
+              style={{ left: '64%' }}
             />
-            <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden="true">
-              <path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            {cta}
-          </motion.a>
-
-          <motion.a
-            href="#process"
-            className="inline-flex items-center gap-2 rounded-full px-8 py-4 text-base font-semibold text-slate-300 transition-colors hover:text-white"
-            style={{
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              backdropFilter: 'blur(10px)',
-            }}
-            whileHover={{ scale: 1.03, borderColor: 'rgba(255,255,255,0.2)' }}
-            whileTap={{ scale: 0.97 }}
-          >
-            {ctaSecondary}
-            <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" aria-hidden="true">
-              <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </motion.a>
-        </motion.div>
-
-        {/* Trust badge */}
-        <motion.div variants={itemVariants} className="mt-12 flex justify-center">
-          <div className="flex items-center gap-3">
-            <div className="flex -space-x-2">
-              {[
-                'bg-violet-500',
-                'bg-blue-500',
-                'bg-emerald-500',
-                'bg-orange-500',
-                'bg-pink-500',
-              ].map((color, i) => (
-                <div
-                  key={i}
-                  className={`h-7 w-7 rounded-full border-2 border-slate-900 ${color} flex items-center justify-center text-[9px] font-bold text-white`}
-                >
-                  {String.fromCharCode(65 + i)}
-                </div>
-              ))}
-            </div>
-            <span className="text-sm text-slate-500">{badge}</span>
           </div>
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--post)]">
+            B
+          </span>
         </motion.div>
-      </motion.div>
-
-      {/* Scroll indicator */}
-      <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.5, duration: 0.6 }}
-      >
-        <motion.div
-          className="flex flex-col items-center gap-2"
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <span className="text-[10px] tracking-widest uppercase text-slate-600">Scroll</span>
-          <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 text-slate-600" aria-hidden="true">
-            <path d="M12 5v14M5 12l7 7 7-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </motion.div>
-      </motion.div>
+      </div>
     </section>
   );
 }
